@@ -1,0 +1,313 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Kalimba tabs generator</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		textarea {
+			width: 100%;
+		}
+		.textarea-wrap {
+			width: 49.8%;
+    		display: inline-grid;
+		}
+		div.line {
+			display: flex;
+			justify-content: center;
+			margin: 10px 0;
+			gap: 15px
+		}
+
+		button.note,
+		button.command {
+			padding: 8px;
+			font-size: 20px;
+			cursor: pointer;
+			border: 0;
+			border-radius: 4px;
+			background-color: #81cbbd;
+			box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
+			transition: all 0.1s ease-in-out
+		}
+
+		button.command:disabled {
+			cursor: initial
+		}
+
+		button.note:hover:not(:disabled),
+		button.command:hover:not(:disabled) {
+			box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.7)
+		}
+
+		.chord-button.command {
+			width: 45px
+		}
+	</style>
+	<style>
+		.line span {
+			display: inline-block;
+			color: red;
+			letter-spacing: 10px;
+		}
+
+		.one_dot_above::before {
+			content: ".";
+			position: relative;
+			bottom: 5px;
+			line-height: 0px;
+			float: left;
+			letter-spacing: -10px;
+		}
+
+		.two_dots_above::before {
+			content: "..";
+			position: relative;
+			bottom: 5px;
+			line-height: 0px;
+			float: left;
+			letter-spacing: -3px;
+			left: -4px;
+		}
+
+		.one_dot_below::after {
+			content: ".";
+			position: relative;
+			top: 18px;
+			line-height: 0px;
+			float: left;
+			letter-spacing: -10px;
+		}
+
+		.two_dots_above {
+			letter-spacing: -3px !important;
+		}
+
+		pre {
+			font-size: 18px;
+		}
+
+		.chord::before {
+			content: "(";
+			position: relative;
+			float: left;
+			letter-spacing: 0px;
+		}
+
+		.chord::after {
+			content: ")";
+			position: relative;
+			float: right;
+			letter-spacing: 0px;
+			left: -12px;
+		}
+
+		.chord {
+			letter-spacing: 0px !important;
+			margin-left: -4px;
+			margin-right: -4px;
+		}
+
+		.sharp::after {
+			content: "#";
+			position: relative;
+			float: right;
+			letter-spacing: 0px;
+			left: -12px;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Kalimba tabs markdown to HTML</h1>
+	<p>
+		Can use: 
+	</p>
+	<ul>
+		<li>numbers 1-9</li>
+		<li>numbers with asterisk 1-9* will be converted to number with one dot above</li>
+		<li>numbers with two asterisk 1-9** will be converted to number with two dot above</li>
+		<li>numbers with dot 4-7. will be converted to number with one dot under</li>
+	</ul>
+	<div>
+		<div class="textarea-wrap">
+			<label for="source">Markdown:</label><br>
+			<textarea name="source" id="source" rows="25" title="input markdown">
+1* 3* 7 1* 6 7 5 4 2 4 2 4 
+All around me are familiar faces 
+
+(5 1*) 3* 7 1* 6 7 1* (2 2*) 5* 4* 3* 2* 1* 7 6
+Worn-out places, worn-out faces
+
+
+
+Test line:
+
+4. 3** (2** 3 4*)
+			</textarea>
+		</div>
+		<div class="textarea-wrap">
+			<label for="result">Resulting HTML:</label><br>
+			<textarea name="result" id="result" rows="25" title="result html"></textarea>
+			<div class="keybord">
+				<div class="line">
+					<div>
+						<input type="radio" id="numbers" name="tabs_type" value="Numbers" checked>
+						<label for="numbers">Numbers</label><br>
+						<input type="radio" id="letters" name="tabs_type" value="Letters">
+						<label for="letters">Letters</label><br></div>
+					<button class="command" onclick="processTextarea()">Generate HTML</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<h2>Result</h2>
+	<div id="result-view">
+	</div>
+
+	<script>
+		var radioTabsTypeVal;
+
+		const radios = document.querySelectorAll('input[name="tabs_type"]');
+			radios.forEach(radio => {
+				radio.addEventListener('click', function () {
+					radioTabsTypeVal = radio.value;
+					console.log(radioTabsTypeVal);
+				});
+		});
+
+		/**
+		 * processTextarea takes content from source and converts it to html
+		 **/
+		function processTextarea() {
+			var lines = document.getElementById("source").value.split('\n');
+			var resultContainer = document.getElementById("result");
+			var resultContent = '';
+
+			// read source line by line
+			for (var i = 0; i < lines.length; i++) {
+				console.log(lines[i]);
+				if (lines[i].length > 0) {
+					var newLine = buildHTML(lines[i]);
+					if (lines[i] !== newLine) {
+						newLine = '<span class="line">' + newLine + '</span>'
+					}
+					resultContent += newLine + '\n';
+				} else {
+					resultContent += '\n';
+				}
+
+
+			}
+
+			resultContent = '<pre>' + resultContent + '</pre>'
+			resultContainer.textContent = resultContent;
+			var resultContainer = document.getElementById("result-view");
+			resultContainer.innerHTML = resultContent;
+		}
+
+		/**
+		 * buildHTML executes regexp on given string and replace simple notation to html 
+		 **/
+		function buildHTML(str) {
+			const regex = /\((?<chord>((\d(\*{1,2}|\.)?\#{0,1})|\s)+)\)|(?<!\()(?<note>\d(\*{1,2}|\.)?\#{0,1})(?!\))/gm;
+
+			const mappingToHtml = {
+				'1': '<span class="one">1</span>',
+				'2': '<span class="two">2</span>',
+				'3': '<span class="three">3</span>',
+				'4': '<span class="four">4</span>',
+				'5': '<span class="five">5</span>',
+				'6': '<span class="six">6</span>',
+				'7': '<span class="seven">7</span>',
+
+				'1*': '<span class="one one_dot_above">1</span>',
+				'2*': '<span class="two one_dot_above">2</span>',
+				'3*': '<span class="three one_dot_above">3</span>',
+				'4*': '<span class="four one_dot_above">4</span>',
+				'5*': '<span class="five one_dot_above">5</span>',
+				'6*': '<span class="six one_dot_above">6</span>',
+				'7*': '<span class="seven one_dot_above">7</span>',
+
+				'1**': '<span class="one two_dots_above">1</span>',
+				'2**': '<span class="two two_dots_above">2</span>',
+				'3**': '<span class="three two_dots_above">3</span>',
+				'4**': '<span class="four two_dots_above">4</span>',
+				'5**': '<span class="five two_dots_above">5</span>',
+				'6**': '<span class="six two_dots_above">6</span>',
+				'7**': '<span class="seven two_dots_above">7</span>',
+
+				'4.': '<span class="four one_dot_below">4</span>',
+				'5.': '<span class="five one_dot_below">5</span>',
+				'6.': '<span class="six one_dot_below">6</span>',
+				'7.': '<span class="seven one_dot_below">7</span>',
+			}
+
+			// Alternative syntax using RegExp constructor
+			// const regex = new RegExp('\\((?<chord>((\\d(\\*{1,2}|\\.)?\\#{0,1})|\\s)+)\\)|(?<!\\()(?<note>\\d(\\*{1,2}|\\.)?\\#{0,1})(?!\\))', 'gm')
+			let m;
+			var resultStr = str;
+			// offset needs for calculating correct index
+			var offset = 0;
+
+			while ((m = regex.exec(str)) !== null) {
+				// This is necessary to avoid infinite loops with zero-width matches
+				if (m.index === regex.lastIndex) {
+					regex.lastIndex++;
+				}
+
+				var chord = m['groups'].chord;
+				if (typeof chord !== 'undefined') {
+					var chordHtml = buildHTML(chord);
+					chordHtml = '<span class="chord">' + chordHtml + '</span>'
+					resultStr = replaceText(resultStr, '(' + chord + ')', chordHtml, m['index'] + offset);
+					offset += chordHtml.length - ('(' + chord + ')').length
+				}
+
+				var note = m['groups'].note;
+				if (typeof note !== 'undefined' && typeof mappingToHtml[note] !== 'undefined') {
+					//resultStr = resultStr.replaceAll(note, mappingToHtml[note]);
+					var subst = mappingToHtml[note];
+					if(radioTabsTypeVal === 'Letters') {
+						const  regex = /\d{1,1}/mu;
+						if ((n = regex.exec(subst)) !== null) {
+							subst = subst.replace(n[0], mappingNumberLetter[n[0]]);
+						}
+					}
+					
+					resultStr = replaceText(resultStr, note, subst, m['index'] + offset);
+					offset += mappingToHtml[note].length - note.length
+				}
+			}
+
+			return resultStr;
+		}
+
+		const mappingNumberLetter = {
+			1: 'C',
+			2: 'D',
+			3: 'E',
+			4: 'F',
+			5: 'G',
+			6: 'A',
+			7: 'B',
+			C: '1',
+			D: '2',
+			E: '3',
+			F: '4',
+			G: '5',
+			A: '6',
+			B: '7',
+		}
+
+		/**
+		 * replaceText needs for replace exact entry by index
+		 **/
+		function replaceText(text, find, insert, index) {
+			var prefix = text.substring(0, index);
+			var postfix = text.substring(index + find.length);
+
+			return prefix + insert + postfix;
+		}
+	</script>
+</body>
+</html>
