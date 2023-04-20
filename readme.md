@@ -1,5 +1,7 @@
 # Kalimba tabs generator
 
+Demo: [https://shapito27.github.io/kalimba-tabs/](https://shapito27.github.io/kalimba-tabs/) 
+
 It can generate from markdown like:
 ```
 1* 3* 7 1* 6 7 5 4 2 4 2 4 
