@@ -10,12 +10,14 @@ Worn-out places, worn-out faces
 ```
 
 to html code, that looks like:
+
 ![](https://github.com/shapito27/kalimba-tabs/blob/main/img/numbers.png)
 
-or in letter notation:
+or in the letter notation:
+
 ![](https://github.com/shapito27/kalimba-tabs/blob/main/img/letters.png)
 
-You can use in markdown:
+What you can use in markdown:
 
 - numbers 1-9
 - numbers with asterisk 1-9* will be converted to number with one dot above
