@@ -24,4 +24,5 @@ What you can use in markdown:
 - numbers 1-9
 - numbers with asterisk 1-9* will be converted to number with one dot above
 - numbers with two asterisk 1-9** will be converted to number with two dot above
+- numbers without or with asterisk and sharp 1#, 2*#, 3**# will be converted to number without or with dots above, and sharp
 - numbers with dot 4-7. will be converted to the number with one dot under

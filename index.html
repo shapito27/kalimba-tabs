@@ -123,9 +123,10 @@
 		Can use: 
 	</p>
 	<ul>
-		<li>numbers 1-9</li>
-		<li>numbers with asterisk 1-9* will be converted to number with one dot above</li>
-		<li>numbers with two asterisk 1-9** will be converted to number with two dot above</li>
+		<li>numbers 1-7</li>
+		<li>numbers with asterisk 1-7* will be converted to number with one dot above</li>
+		<li>numbers with two asterisk 1-7** will be converted to number with two dot above</li>
+		<li>numbers with asterisk withour or with asterisk and diez 1#, 2*#, 3**# will be converted to number with dots above(if have) and diez</li>
 		<li>numbers with dot 4-7. will be converted to number with one dot under</li>
 	</ul>
 	<div>
@@ -219,6 +220,13 @@ Test line:
 				'5': '<span class="five">5</span>',
 				'6': '<span class="six">6</span>',
 				'7': '<span class="seven">7</span>',
+				'1#': '<span class="one sharp">1</span>',
+				'2#': '<span class="two sharp">2</span>',
+				'3#': '<span class="three sharp">3</span>',
+				'4#': '<span class="four sharp">4</span>',
+				'5#': '<span class="five sharp">5</span>',
+				'6#': '<span class="six sharp">6</span>',
+				'7#': '<span class="seven sharp">7</span>',
 
 				'1*': '<span class="one one_dot_above">1</span>',
 				'2*': '<span class="two one_dot_above">2</span>',
@@ -227,6 +235,13 @@ Test line:
 				'5*': '<span class="five one_dot_above">5</span>',
 				'6*': '<span class="six one_dot_above">6</span>',
 				'7*': '<span class="seven one_dot_above">7</span>',
+				'1*#': '<span class="one one_dot_above sharp">1</span>',
+				'2*#': '<span class="two one_dot_above sharp">2</span>',
+				'3*#': '<span class="three one_dot_above sharp">3</span>',
+				'4*#': '<span class="four one_dot_above sharp">4</span>',
+				'5*#': '<span class="five one_dot_above sharp">5</span>',
+				'6*#': '<span class="six one_dot_above sharp">6</span>',
+				'7*#': '<span class="seven one_dot_above sharp">7</span>',
 
 				'1**': '<span class="one two_dots_above">1</span>',
 				'2**': '<span class="two two_dots_above">2</span>',
@@ -235,6 +250,14 @@ Test line:
 				'5**': '<span class="five two_dots_above">5</span>',
 				'6**': '<span class="six two_dots_above">6</span>',
 				'7**': '<span class="seven two_dots_above">7</span>',
+				'1**#': '<span class="one two_dots_above sharp">1</span>',
+				'2**#': '<span class="two two_dots_above sharp">2</span>',
+				'3**#': '<span class="three two_dots_above sharp">3</span>',
+				'4**#': '<span class="four two_dots_above sharp">4</span>',
+				'5**#': '<span class="five two_dots_above sharp">5</span>',
+				'6**#': '<span class="six two_dots_above sharp">6</span>',
+				'7**#': '<span class="seven two_dots_above sharp">7</span>',
+
 
 				'4.': '<span class="four one_dot_below">4</span>',
 				'5.': '<span class="five one_dot_below">5</span>',
