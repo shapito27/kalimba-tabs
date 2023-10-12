@@ -114,6 +114,12 @@
 			letter-spacing: 0px;
 			left: -12px;
 		}
+		.lyrics {
+			display: block;
+		}
+		.hidden {
+			display: none;
+		}
 	</style>
 </head>
 
@@ -192,6 +198,9 @@ Test line:
 					if (lines[i] !== newLine) {
 						newLine = '<span class="line">' + newLine + '</span>'
 					}
+					else {
+						newLine = '<span class="lyrics">' + newLine + '</span>'
+					}
 					resultContent += newLine + '\n';
 				} else {
 					resultContent += '\n';
@@ -222,12 +231,10 @@ Test line:
 				'7': '<span class="seven">7</span>',
 				'1#': '<span class="one sharp">1</span>',
 				'2#': '<span class="two sharp">2</span>',
-				'3#': '<span class="three sharp">3</span>',
 				'4#': '<span class="four sharp">4</span>',
 				'5#': '<span class="five sharp">5</span>',
 				'6#': '<span class="six sharp">6</span>',
-				'7#': '<span class="seven sharp">7</span>',
-
+				
 				'1*': '<span class="one one_dot_above">1</span>',
 				'2*': '<span class="two one_dot_above">2</span>',
 				'3*': '<span class="three one_dot_above">3</span>',
@@ -237,12 +244,10 @@ Test line:
 				'7*': '<span class="seven one_dot_above">7</span>',
 				'1*#': '<span class="one one_dot_above sharp">1</span>',
 				'2*#': '<span class="two one_dot_above sharp">2</span>',
-				'3*#': '<span class="three one_dot_above sharp">3</span>',
 				'4*#': '<span class="four one_dot_above sharp">4</span>',
 				'5*#': '<span class="five one_dot_above sharp">5</span>',
 				'6*#': '<span class="six one_dot_above sharp">6</span>',
-				'7*#': '<span class="seven one_dot_above sharp">7</span>',
-
+				
 				'1**': '<span class="one two_dots_above">1</span>',
 				'2**': '<span class="two two_dots_above">2</span>',
 				'3**': '<span class="three two_dots_above">3</span>',
@@ -252,17 +257,22 @@ Test line:
 				'7**': '<span class="seven two_dots_above">7</span>',
 				'1**#': '<span class="one two_dots_above sharp">1</span>',
 				'2**#': '<span class="two two_dots_above sharp">2</span>',
-				'3**#': '<span class="three two_dots_above sharp">3</span>',
 				'4**#': '<span class="four two_dots_above sharp">4</span>',
 				'5**#': '<span class="five two_dots_above sharp">5</span>',
 				'6**#': '<span class="six two_dots_above sharp">6</span>',
-				'7**#': '<span class="seven two_dots_above sharp">7</span>',
-
-
+				
+				'1.': '<span class="four one_dot_below">4</span>',
+				'2.': '<span class="four one_dot_below">4</span>',
+				'3.': '<span class="four one_dot_below">4</span>',
 				'4.': '<span class="four one_dot_below">4</span>',
 				'5.': '<span class="five one_dot_below">5</span>',
 				'6.': '<span class="six one_dot_below">6</span>',
 				'7.': '<span class="seven one_dot_below">7</span>',
+				'1.#': '<span class="one one_dot_above sharp">1</span>',
+				'2.#': '<span class="two one_dot_above sharp">2</span>',
+				'4.#': '<span class="four one_dot_above sharp">4</span>',
+				'5.#': '<span class="five one_dot_above sharp">5</span>',
+				'6.#': '<span class="six one_dot_above sharp">6</span>',
 			}
 
 			// Alternative syntax using RegExp constructor
