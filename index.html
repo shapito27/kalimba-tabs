@@ -145,11 +145,14 @@ All around me are familiar faces
 (5 1*) 3* 7 1* 6 7 1* (2 2*) 5* 4* 3* 2* 1* 7 6
 Worn-out places, worn-out faces
 
-
+2-3
+3-4-5
+(4* 3-5 6-7)
 
 Test line:
 
 4. 3** (2** 3 4*)
+			
 			</textarea>
 		</div>
 		<div class="textarea-wrap">
@@ -181,47 +184,8 @@ Test line:
 					console.log(radioTabsTypeVal);
 				});
 		});
-
-		/**
-		 * processTextarea takes content from source and converts it to html
-		 **/
-		function processTextarea() {
-			var lines = document.getElementById("source").value.split('\n');
-			var resultContainer = document.getElementById("result");
-			var resultContent = '';
-
-			// read source line by line
-			for (var i = 0; i < lines.length; i++) {
-				console.log(lines[i]);
-				if (lines[i].length > 0) {
-					var newLine = buildHTML(lines[i]);
-					if (lines[i] !== newLine) {
-						newLine = '<span class="line">' + newLine + '</span>'
-					}
-					else {
-						newLine = '<span class="lyrics">' + newLine + '</span>'
-					}
-					resultContent += newLine + '\n';
-				} else {
-					resultContent += '\n';
-				}
-
-
-			}
-
-			resultContent = '<pre>' + resultContent + '</pre>'
-			resultContainer.textContent = resultContent;
-			var resultContainer = document.getElementById("result-view");
-			resultContainer.innerHTML = resultContent;
-		}
-
-		/**
-		 * buildHTML executes regexp on given string and replace simple notation to html 
-		 **/
-		function buildHTML(str) {
-			const regex = /\((?<chord>((\d(\*{1,2}|\.)?\#{0,1})|\s)+)\)|(?<!\()(?<note>\d(\*{1,2}|\.)?\#{0,1})(?!\))/gm;
-
-			const mappingToHtml = {
+		
+		const mappingToHtml = {
 				'1': '<span class="one">1</span>',
 				'2': '<span class="two">2</span>',
 				'3': '<span class="three">3</span>',
@@ -273,10 +237,55 @@ Test line:
 				'4.#': '<span class="four one_dot_below sharp">4</span>',
 				'5.#': '<span class="five one_dot_below sharp">5</span>',
 				'6.#': '<span class="six one_dot_below sharp">6</span>',
+			};
+
+		/**
+		 * processTextarea takes content from source and converts it to html
+		 **/
+		function processTextarea() {
+			var lines = document.getElementById("source").value.split('\n');
+			var resultContainer = document.getElementById("result");
+			var resultContent = '';
+
+			// read source line by line
+			for (var i = 0; i < lines.length; i++) {
+				console.log(lines[i]);
+				if (lines[i].length > 0) {
+					var newLine = buildHTML(lines[i]);
+					if (lines[i] !== newLine) {
+						newLine = '<span class="line">' + newLine + '</span>'
+					}
+					else {
+						newLine = '<span class="lyrics">' + newLine + '</span>'
+					}
+					resultContent += newLine + '\n';
+				} else {
+					resultContent += '\n';
+				}
+
+
 			}
 
-			// Alternative syntax using RegExp constructor
-			// const regex = new RegExp('\\((?<chord>((\\d(\\*{1,2}|\\.)?\\#{0,1})|\\s)+)\\)|(?<!\\()(?<note>\\d(\\*{1,2}|\\.)?\\#{0,1})(?!\\))', 'gm')
+			resultContent = '<pre>' + resultContent + '</pre>'
+			resultContainer.textContent = resultContent;
+			var resultContainer = document.getElementById("result-view");
+			resultContainer.innerHTML = resultContent;
+		}
+
+
+		/**
+		 * buildHTML executes regexp on given string and replace simple notation to html 
+		 **/
+		function buildHTML(str) {
+			const notePattern = `\\d(\\*{1,2}|\\.)?\\#{0,1}`;
+			const legatoPattern = `${notePattern}(-${notePattern}){1,4}`;
+			const chordNamedCapturedGroup = `\\((?<chord>((${notePattern})|\\s|${legatoPattern})+)\\)`;
+			const noteNamedCapturedGroup = `(?<!\\()(?<note>${notePattern})(?!\\))`;
+			
+			const legatoNamedCapturedGroup = `(?<legato>${legatoPattern})`;
+			const legatoInChordNamedCapturedGroup = `(?<legatoinchord>${legatoPattern})`;
+			const regex = new RegExp(`${legatoNamedCapturedGroup}|${chordNamedCapturedGroup}|${noteNamedCapturedGroup}`, 'gm')
+			
 			let m;
 			var resultStr = str;
 			// offset needs for calculating correct index
@@ -288,16 +297,68 @@ Test line:
 					regex.lastIndex++;
 				}
 
-				var chord = m['groups'].chord;
+				var chord = m['groups'].chord;				
 				if (typeof chord !== 'undefined') {
+				// processing chord
 					var chordHtml = buildHTML(chord);
 					chordHtml = '<span class="chord">' + chordHtml + '</span>'
 					resultStr = replaceText(resultStr, '(' + chord + ')', chordHtml, m['index'] + offset);
 					offset += chordHtml.length - ('(' + chord + ')').length
 				}
+				
+				var legato = m['groups'].legato;				
+				if (typeof legato !== 'undefined') {
+				// processing legato
+					var chordHtml = buildNotesHtml(legato);
+					chordHtml = '<span class="legato">' + chordHtml + '</span>'
+					resultStr = replaceText(resultStr, legato, chordHtml, m['index'] + offset);
+					offset += chordHtml.length - (legato).length
+				}
 
 				var note = m['groups'].note;
 				if (typeof note !== 'undefined' && typeof mappingToHtml[note] !== 'undefined') {
+				// processing note
+					//resultStr = resultStr.replaceAll(note, mappingToHtml[note]);
+					var subst = mappingToHtml[note];
+					if(radioTabsTypeVal === 'Letters') {
+						const  regex = /\d{1,1}/mu;
+						if ((n = regex.exec(subst)) !== null) {
+							subst = subst.replace(n[0], mappingNumberLetter[n[0]]);
+						}
+					}
+					
+					resultStr = replaceText(resultStr, note, subst, m['index'] + offset);
+					offset += mappingToHtml[note].length - note.length
+				}
+			}
+
+			return resultStr;
+		}
+		
+		function buildNotesHtml(str){
+			const notePattern = `\\d(\\*{1,2}|\\.)?\\#{0,1}`;
+			const chordNamedCapturedGroup = `\\((?<chord>((${notePattern})|\\s)+)\\)`;
+			const noteNamedCapturedGroup = `(?<!\\()(?<note>${notePattern})(?!\\))`;
+			const legatoPattern = `${notePattern}(-${notePattern}){1,4}`;
+			const legatoNamedCapturedGroup = `(?<legato>${legatoPattern})`;
+			const legatoInChordNamedCapturedGroup = `(?<legatoinchord>${legatoPattern})`;
+			const regex = new RegExp(`${noteNamedCapturedGroup}`, 'gm')
+			
+			let m;
+			var resultStr = str;
+			// offset needs for calculating correct index
+			var offset = 0;
+
+			while ((m = regex.exec(str)) !== null) {
+				// This is necessary to avoid infinite loops with zero-width matches
+				if (m.index === regex.lastIndex) {
+					regex.lastIndex++;
+				}
+
+
+				var note = m['groups'].note;
+				if (typeof note !== 'undefined' && typeof mappingToHtml[note] !== 'undefined') {
+				// processing note
 					//resultStr = resultStr.replaceAll(note, mappingToHtml[note]);
 					var subst = mappingToHtml[note];
 					if(radioTabsTypeVal === 'Letters') {
